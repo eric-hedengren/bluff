@@ -1,4 +1,12 @@
-from random import randint
+import random
+
+def roll(number):
+    dice = []
+
+    for i in range(number):
+        dice.append(random.randint(1,6))
+
+    return dice
 
 humans = []
 
@@ -33,9 +41,6 @@ for i in range(1,bots+1):
 player_data = {}
 
 for player_name in player_names:
-    rolled_dice = []
+    player_data[player_name] = {'dice': roll(dice_number)}
 
-    for i in range(dice_number):
-        rolled_dice.append(randint(1,6))
-
-    player_data[player_name] = rolled_dice
+random.shuffle(player_names)

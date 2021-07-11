@@ -12,7 +12,7 @@ def roll(number):
 
     return sorted(dice)
 
-def known_dice(current_player):
+def known_dice():
     revealed_dice = player_data[current_player]['dice']
 
     for player_name in player_names:
@@ -22,7 +22,7 @@ def known_dice(current_player):
 
     return sorted(revealed_dice)
 
-def unknown_dice(current_player):
+def unknown_dice():
     unknown_dice = 0
 
     other_players = player_names
@@ -90,18 +90,19 @@ while True:
     random.shuffle(player_names)
 
     turn = 1
-    player_turn = player_names[turn-1]
+    current_player = player_names[turn-1]
 
 
     # bot first turn
-    if player_turn.startswith('bot'):
-        current_guess = bot.bot_turn_first(known_dice(player_turn),unknown_dice(player_turn))
+    if current_player.startswith('bot'):
+        current_guess = bot.bot_turn_first(known_dice(),unknown_dice())
+        print("{bot} took it's turn".format(bot=current_player))
 
     # human first turn
     else:
-        print("It's {player}'s turn".format(player=player_turn))
-        print("These are the dice you have rolled: {dice}".format(dice=player_data[player_turn]['dice']))
-        print("There are {number} dice you cannot see".format(number=unknown_dice(player_turn)))
+        print("It's {player}'s turn".format(player=current_player))
+        print("These are the dice you have rolled: {dice}".format(dice=player_data[current_player]['dice']))
+        print("There are {number} dice you cannot see".format(number=unknown_dice()))
         print("What's your guess?")
 
         current_guess = []
@@ -119,15 +120,16 @@ while True:
     # the game after the first turn
     while True:
         turn += 1
-        player_turn = player_names[(turn-1)%player_number]
+        current_player = player_names[(turn-1)%player_number]
 
         # bot turn
-        if player_turn.startswith('bot'):
-            current_guess = bot.bot_turn(current_guess,known_dice(player_turn),unknown_dice(player_turn))
+        if current_player.startswith('bot'):
+            current_guess = bot.bot_turn(current_guess,known_dice(),unknown_dice())
+            print("{bot} took it's turn".format(bot=current_player))
 
         # human turn
         else:
-            print("It's {player}'s turn".format(player=player_turn))
+            print("It's {player}'s turn".format(player=current_player))
             print("The current guess is {number} {roll}s".format(number=current_guess[0], roll=current_guess[1]))
 
             # display revealed dice, their dice, and the number of unknown dice

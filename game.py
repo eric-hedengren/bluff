@@ -33,8 +33,13 @@ def unknown_dice():
 
     return unknown_dice
 
-def validate_guess(current):
-    return current
+def total_dice():
+    total = 0
+    
+    for player_name in player_names:
+        total += len(player_data[player_name]['dice']) + len(player_data[player_name]['revealed_dice'])
+
+    return total
 
 
 # players
@@ -113,8 +118,11 @@ while True:
         if current_guess[0] <= 0:
             raise Exception("Not a valid quantity.")
 
+        if current_guess[0] > total_dice():
+            raise Exception("Cannot guess higher than the total number of dice.")
+
         if current_guess[1] < 1 or current_guess[1] > 6:
-            raise Exception("You can't guess outside the 1-6 range.")
+            raise Exception("You cannot guess outside the 1-6 range.")
 
 
     # the game after the first turn
@@ -134,7 +142,18 @@ while True:
 
             # display revealed dice, their dice, and the number of unknown dice
             # let them choose to call a bluff, or take a guess
-            # if guess was chosen, let them keep the dice they have, or put some dice out and re roll
+            # if guess was chosen, let them keep the dice they have, or put some dice out and re roll, then guess
+            previous_guess = current_guess
+
+            # validate the guess
+            if current_guess[0] > total_dice():
+                raise Exception("Cannot guess higher than the total number of dice.")
+
+            if current_guess[1] < 1 or current_guess[1] > 6:
+                raise Exception("You cannot guess outside the 1-6 range.")
+
+            # check if the guess switched between 6 and 1-5
+
 
         # if a guess was called: 
         # check who won the round

@@ -25,7 +25,7 @@ def known_dice():
 def unknown_dice():
     unknown_dice = 0
 
-    other_players = player_names
+    other_players = player_names.copy()
     other_players.remove(current_player)
 
     for other_player in other_players:

@@ -1,6 +1,5 @@
 # imports
 import random
-import bot
 
 
 # functions
@@ -12,17 +11,16 @@ def roll(number):
 
     return sorted(dice)
 
-def known_dice():
+def known_dice(player_data, player_names, current_player):
     revealed_dice = player_data[current_player]['dice']
 
     for player_name in player_names:
-        revealed_dice.append(player_data[player_name]['revealed_dice'])
-
-    # make complete list all raw data
+        for value in player_data[player_name]['revealed_dice']:
+            revealed_dice.append(value)
 
     return sorted(revealed_dice)
 
-def unknown_dice():
+def unknown_dice(player_data, player_names, current_player):
     unknown_dice = 0
 
     other_players = player_names.copy()
@@ -33,13 +31,21 @@ def unknown_dice():
 
     return unknown_dice
 
-def total_dice():
+def total_dice(player_data, player_names):
     total = 0
     
     for player_name in player_names:
         total += len(player_data[player_name]['dice']) + len(player_data[player_name]['revealed_dice'])
 
     return total
+
+
+# logic
+def bot_turn_first(known,unknown):
+    return known,unknown
+
+def bot_turn(guess,known,unknown):
+    return guess,known,unknown
 
 
 # players
@@ -90,7 +96,6 @@ while True:
     for player_name in player_names:
         player_data[player_name] = {'dice': roll(dice_number), 'revealed_dice': []}
 
-
     # determine player order
     random.shuffle(player_names)
 
@@ -100,14 +105,14 @@ while True:
 
     # bot first turn
     if current_player.startswith('bot'):
-        current_guess = bot.bot_turn_first(known_dice(),unknown_dice())
+        current_guess = bot_turn_first(known_dice(player_data, player_names, current_player),unknown_dice(player_data, player_names, current_player))
         print("{bot} took it's turn".format(bot=current_player))
 
     # human first turn
     else:
         print("It's {player}'s turn".format(player=current_player))
         print("These are the dice you have rolled: {dice}".format(dice=player_data[current_player]['dice']))
-        print("There are {number} dice you cannot see".format(number=unknown_dice()))
+        print("There are {number} dice you cannot see".format(number=unknown_dice(player_data, player_names, current_player)))
         print("What's your guess?")
 
         current_guess = []
@@ -118,7 +123,7 @@ while True:
         if current_guess[0] <= 0:
             raise Exception("Not a valid quantity.")
 
-        if current_guess[0] > total_dice():
+        if current_guess[0] > total_dice(player_data, player_names):
             raise Exception("Cannot guess higher than the total number of dice.")
 
         if current_guess[1] < 1 or current_guess[1] > 6:
@@ -132,21 +137,23 @@ while True:
 
         # bot turn
         if current_player.startswith('bot'):
-            current_guess = bot.bot_turn(current_guess,known_dice(),unknown_dice())
+            current_guess = bot_turn(current_guess,known_dice(player_data, player_names, current_player),unknown_dice())
             print("{bot} took it's turn".format(bot=current_player))
 
         # human turn
         else:
             print("It's {player}'s turn".format(player=current_player))
+            print("These are the dice that are known: {dice}".format(dice = known_dice(player_data, player_names, current_player)))
+            print("There are {number} dice you cannot see".format(number=unknown_dice(player_data, player_names, current_player)))
             print("The current guess is {number} {roll}s".format(number=current_guess[0], roll=current_guess[1]))
+            
+            choice = input("Do you want to call it, or guess higher? ").lower()
 
-            # display revealed dice, their dice, and the number of unknown dice
-            # let them choose to call a bluff, or take a guess
             # if guess was chosen, let them keep the dice they have, or put some dice out and re roll, then guess
             previous_guess = current_guess
 
             # validate the guess
-            if current_guess[0] > total_dice():
+            if current_guess[0] > total_dice(player_data, player_names):
                 raise Exception("Cannot guess higher than the total number of dice.")
 
             if current_guess[1] < 1 or current_guess[1] > 6:

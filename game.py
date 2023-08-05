@@ -11,41 +11,41 @@ def roll(number):
 
     return sorted(dice)
 
-def known_dice(player_data, player_names, current_player):
-    revealed_dice = player_data[current_player]['dice']
-
-    for player_name in player_names:
-        for value in player_data[player_name]['revealed_dice']:
-            revealed_dice.append(value)
-
-    return sorted(revealed_dice)
-
-def unknown_dice(player_data, player_names, current_player):
-    unknown_dice = 0
-
+def dice_data(option):
     other_players = player_names.copy()
     other_players.remove(current_player)
 
-    for other_player in other_players:
-        unknown_dice += len(player_data[other_player]['dice'])
+    if option == 'revealed_dice':
+        revealed_dice = {}
 
-    return unknown_dice
+        for other_player in other_players:
+            revealed_dice[other_player] = player_data[other_player]['revealed_dice']
 
+        return revealed_dice
+
+    elif option == 'unrevealed_dice':
+        unrevealed_dice = {}
+
+        for other_player in other_players:
+            unrevealed_dice[other_player] = len(player_data[other_player]['unrevealed_dice'])
+
+        return unrevealed_dice
+    
 def total_dice(player_data, player_names):
     total = 0
     
     for player_name in player_names:
-        total += len(player_data[player_name]['dice']) + len(player_data[player_name]['revealed_dice'])
+        total += len(player_data[player_name]['revealed_dice'] + len(player_data[player_name]['unrevealed_dice']))
 
     return total
 
 
-# logic
-def bot_turn_first(known,unknown):
-    return known,unknown
+# bot logic
+def bot_turn_first():
+    return
 
-def bot_turn(guess,known,unknown):
-    return guess,known,unknown
+def bot_turn():
+    return
 
 
 # players
@@ -94,7 +94,7 @@ while True:
     player_data = {}
 
     for player_name in player_names:
-        player_data[player_name] = {'dice': roll(dice_number), 'revealed_dice': []}
+        player_data[player_name] = {'revealed_dice': [], 'unrevealed_dice': roll(dice_number)}
 
     # determine player order
     random.shuffle(player_names)
@@ -105,14 +105,14 @@ while True:
 
     # bot first turn
     if current_player.startswith('bot'):
-        current_guess = bot_turn_first(known_dice(player_data, player_names, current_player),unknown_dice(player_data, player_names, current_player))
+        current_guess = bot_turn_first()
         print("{bot} took it's turn".format(bot=current_player))
 
     # human first turn
     else:
         print("It's {player}'s turn".format(player=current_player))
-        print("These are the dice you have rolled: {dice}".format(dice=player_data[current_player]['dice']))
-        print("There are {number} dice you cannot see".format(number=unknown_dice(player_data, player_names, current_player)))
+        print("These are the dice you have rolled: {dice}".format(dice=player_data[current_player]['unrevealed_dice']))
+        print("There are {number} dice you cannot see".format(number=dice_data('unrevealed_dice')))
         print("What's your guess?")
 
         current_guess = []
@@ -137,14 +137,14 @@ while True:
 
         # bot turn
         if current_player.startswith('bot'):
-            current_guess = bot_turn(current_guess,known_dice(player_data, player_names, current_player),unknown_dice())
+            current_guess = bot_turn()
             print("{bot} took it's turn".format(bot=current_player))
 
         # human turn
         else:
             print("It's {player}'s turn".format(player=current_player))
-            print("These are the dice that are known: {dice}".format(dice = known_dice(player_data, player_names, current_player)))
-            print("There are {number} dice you cannot see".format(number=unknown_dice(player_data, player_names, current_player)))
+            print("These are the dice that are known: {dice}".format(dice=dice_data('revealed_dice')))
+            print("There are {number} dice you cannot see".format(number=dice_data('unrevealed_dice')))
             print("The current guess is {number} {roll}s".format(number=current_guess[0], roll=current_guess[1]))
             
             choice = input("Do you want to call it, or guess higher? ").lower()

@@ -86,6 +86,11 @@ dice_number = int(input("Enter the number of dice per player: "))
 if dice_number <= 0:
     raise Exception("Number of dice should be greater than 0. Or everyone would lose instantly.")
 
+player_dice = {}
+
+for player_name in player_names:
+    player_dice[player_name] = dice_number
+
 
 # the main game
 while True:
@@ -94,7 +99,7 @@ while True:
     player_data = {}
 
     for player_name in player_names:
-        player_data[player_name] = {'revealed_dice': [], 'unrevealed_dice': roll(dice_number)}
+        player_data[player_name] = {'revealed_dice': [], 'unrevealed_dice': roll(player_dice[player_name])}
 
     # determine player order
     random.shuffle(player_names)

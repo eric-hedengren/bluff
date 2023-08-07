@@ -1,22 +1,20 @@
 import random
 
-
-player_names = []
+starting_names = []
 
 while True:
-    player_name = input("Enter a player name: ").title().strip()
+    starting_name = input("Enter a player name: ").strip().title()
 
-    if player_name == '' or player_name == 'done' or player_name == 'finished':
+    if starting_name == '' or starting_name == 'done' or starting_name == 'finished':
         break
     else:
-        player_names.append(player_name)
+        starting_names.append(starting_name)
 
-if len(player_names) < 2:
+if len(starting_names) < 2:
     raise Exception("Number of players must be equal or greater to 2. The game can't be played with no one or by yourself!")
 
-if len(player_names) != len(set(player_names)):
+if len(starting_names) != len(set(starting_names)):
     raise Exception("Cannot have duplicate player names. Stats are important and we can't track those if you have duplicates!")
-
 
 dice_number = int(input("Enter the number of dice per player: "))
 
@@ -25,30 +23,37 @@ if dice_number <= 0:
 
 player_dice = {}
 
-for player_name in player_names:
-    player_dice[player_name] = dice_number
+for starting_name in starting_names:
+    player_dice[starting_name] = dice_number
 
-game_data = {'current_turn': 0}
-
+game_data = {}
 
 while len(player_dice) > 1:
+    print('running again')
+    if 'previous_winner' in game_data:
+        starting_position = list(player_dice.keys()).index(game_data['previous_winner'])
+        remaining_players = list(player_dice.keys())[starting_position:] + list(player_dice.keys())[:starting_position]
+        remaining_dice = list(player_dice.values())[starting_position:] + list(player_dice.values())[:starting_position]
+        player_dice = {}
+
+        for position, player_name in enumerate(remaining_players):
+            player_dice[player_name] = remaining_dice[position]
+
+    player_names = list(player_dice.keys())
     player_data = {}
 
     for player_name in player_dice:
         player_data[player_name] = [[], sorted([random.randint(1,6) for x in range(player_dice[player_name])])]
 
+    current_turn = 0
     current_guess = [0, 0]
     game_data['bluff_called'] = False
 
     while game_data['bluff_called'] != True:
-        game_data['current_turn'] += 1
-        current_turn = game_data['current_turn']
+        current_turn += 1
 
         current_player = player_names[(current_turn-1)%len(player_names)]
         print("It's {player}'s turn".format(player=current_player))
-
-        if current_turn > 1:
-            print("{player} said there are {quantity}, {value}s".format(player=player_names[(current_turn-2)%len(player_names)], quantity=current_guess[0], value=current_guess[1]))
 
         for player_name in player_data:
             if player_data[player_name][0] == []:
@@ -63,6 +68,9 @@ while len(player_dice) > 1:
                 else:
                     print("You have {revealed} revealed and have {unrevealed} hidden".format(revealed=player_data[player_name][0], unrevealed=player_data[player_name][1]))
 
+        if current_turn > 1:
+            print("{player} said there are {quantity}, {value}s".format(player=player_names[(current_turn-2)%len(player_names)], quantity=current_guess[0], value=current_guess[1]))
+
         if current_turn == 1:
             print("What's your guess?")
 
@@ -70,44 +78,41 @@ while len(player_dice) > 1:
             current_guess[1] = int(input("What number? "))
 
         else:
-            option = input("Will you call their guess or raise it higher? ").lower().strip()
+            option = input("Will you call their guess or raise it higher? ").strip().lower()
 
             if option == 'call' or option == 'call it' or option == 'call the bluff':
                 correct_amount = 0
 
+                for player_name in player_data:
+                    correct_amount += player_data[player_name][0].count(current_guess[1]) + player_data[player_name][1].count(current_guess[1])
+
                 if current_guess[1] != 6:
                     for player_name in player_data:
-                        correct_amount += player_data[player_name][0].count(current_guess[1]) + player_data[player_name][1].count(current_guess[1])
                         correct_amount += player_data[player_name][0].count(6) + player_data[player_name][1].count(6)
 
-                elif current_guess == 6:
-                    for player_name in player_data:
-                        correct_amount += player_data[player_name][0].count(current_guess[1]) + player_data[player_name][1].count(current_guess[1])
-
                 if current_guess[0] == correct_amount:                
+                    game_data['previous_winner'] = player_names[(current_turn-2)%len(player_names)]
                     for player_name in player_dice:
                         if player_name != player_names[(current_turn-2)%len(player_names)]:
                             player_dice[player_name] -= 1
 
-                    game_data['current_turn'] -= 1
-
                 elif current_guess[0] < correct_amount:
+                    game_data['previous_winner'] = player_names[(current_turn-2)%len(player_names)]
                     player_dice[current_player] -= (correct_amount - current_guess[0])
-                    game_data['current_turn'] -= 1
 
                 elif current_guess[0] > correct_amount:
+                    game_data['previous_winner'] = current_player
                     player_dice[player_names[(current_turn-2)%len(player_names)]] -= (current_guess[0] - correct_amount)
 
                 for player_name in player_dice:
                     if player_dice[player_name] <= 0:
                         del player_dice[player_name]
 
-                game_data['current_turn'] -= 1
                 game_data['bluff_called'] = True
 
             else:
                 if len(player_data[current_player][1]) > 1:
-                    option = input("Would you like to put out dice and roll the remaining ones? ").lower().strip()
+                    option = input("Would you like to put out dice and roll the remaining ones? ").strip().lower()
 
                     if option != 'n' and option != 'no':
                         value = int(input("Which number would you like to put out? "))

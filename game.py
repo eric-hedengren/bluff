@@ -9,17 +9,17 @@ def turn():
         print("{player} said there are {quantity}, {value}s".format(player=player_names[(current_turn-2)%len(player_names)], quantity=current_guess[0], value=current_guess[1]))
 
     for player_name in player_data:
-        if player_data[player_name]['revealed'] == []:
+        if player_data[player_name][0] == []:
             if player_name != current_player:
-                print("{player} has not revealed any dice and has {number} hidden dice".format(player=player_name, number=len(player_data[player_name]['unrevealed'])))
+                print("{player} has not revealed any dice and has {number} hidden dice".format(player=player_name, number=len(player_data[player_name][1])))
             else:
-                print("You haven't revealed any dice and have {dice} hidden".format(dice=player_data[player_name]['unrevealed']))
+                print("You haven't revealed any dice and have {dice} hidden".format(dice=player_data[player_name][1]))
 
         else:
             if player_name != current_player:
-                print("{player} has revealed {revealed} and has {number} hidden dice".format(player=player_name, revealed=player_data[player_name]['revealed'], number=len(player_data[player_name]['unrevealed'])))
+                print("{player} has revealed {revealed} and has {number} hidden dice".format(player=player_name, revealed=player_data[player_name][0], number=len(player_data[player_name][1])))
             else:
-                print("You have {revealed} revealed and have {unrevealed} hidden".format(revealed=player_data[player_name]['revealed'], unrevealed=player_data[player_name]['unrevealed']))
+                print("You have {revealed} revealed and have {unrevealed} hidden".format(revealed=player_data[player_name][0], unrevealed=player_data[player_name][1]))
 
     print("The next turn will go to {player}".format(player=player_names[(current_turn)%len(player_names)]))
 
@@ -36,11 +36,11 @@ def turn():
 
             if current_guess[1] != 6:
                 for player_name in player_data:
-                    correct_amount += player_data[player_name]['revealed'].count(current_guess[1]) + player_data[player_name]['unrevealed'].count(current_guess[1])
-                    correct_amount += player_data[player_name]['revealed'].count(6) + player_data[player_name]['unrevealed'].count(6)
+                    correct_amount += player_data[player_name][0].count(current_guess[1]) + player_data[player_name][1].count(current_guess[1])
+                    correct_amount += player_data[player_name][0].count(6) + player_data[player_name][1].count(6)
 
             elif current_guess == 6:
-                correct_amount += player_data[player_name]['revealed'].count(current_guess[1]) + player_data[player_name]['unrevealed'].count(current_guess[1])
+                correct_amount += player_data[player_name][0].count(current_guess[1]) + player_data[player_name][1].count(current_guess[1])
 
             if current_guess[0] == correct_amount:
                 for player_name in player_dice:
@@ -60,56 +60,56 @@ def turn():
             return True
 
         else:
-            if len(player_data[current_player]['unrevealed']) > 1:
+            if len(player_data[current_player][1]) > 1:
                 option = input("Would you like to put out dice and roll the remaining ones? ").lower().strip()
 
                 if option != 'n' and option != 'no':
-                    if player_data[current_player]['revealed'] == []:
-                        print("You haven't revealed any dice and have {dice} hidden".format(dice=player_data[current_player]['unrevealed']))
+                    if player_data[current_player][0] == []:
+                        print("You haven't revealed any dice and have {dice} hidden".format(dice=player_data[current_player][1]))
                     else:
-                        print("You have {revealed} revealed and have {unrevealed} hidden".format(revealed=player_data[current_player]['revealed'], unrevealed=player_data[current_player]['unrevealed']))
+                        print("You have {revealed} revealed and have {unrevealed} hidden".format(revealed=player_data[current_player][0], unrevealed=player_data[current_player][1]))
 
                     value = int(input("Which number would you like to put out? "))
 
                     if value < 1 or value > 6:
                         raise Exception("Not a valid number!")
 
-                    unrevealed = player_data[current_player]['unrevealed']
+                    unrevealed = player_data[current_player][1]
                     amount = unrevealed.count(value)
 
                     if amount == len(unrevealed):
                         amount -= 1
 
-                    player_data[current_player]['revealed'].extend([value]*amount)
-                    player_data[current_player]['unrevealed'] = [number for number in unrevealed if number != value]
+                    player_data[current_player][0].extend([value]*amount)
+                    player_data[current_player][1] = [number for number in unrevealed if number != value]
 
                     if value != 6:
-                        unrevealed = player_data[current_player]['unrevealed']
+                        unrevealed = player_data[current_player][1]
                         amount = unrevealed.count(6)
 
                         if amount == len(unrevealed):
                             amount -= 1
 
-                        player_data[current_player]['revealed'].extend([6]*amount)
-                        player_data[current_player]['unrevealed'] = [number for number in unrevealed if number != 6]
+                        player_data[current_player][0].extend([6]*amount)
+                        player_data[current_player][1] = [number for number in unrevealed if number != 6]
 
-                    player_data[current_player]['revealed'] = sorted(player_data[current_player]['revealed'])
-                    player_data[current_player]['unrevealed'] = sorted([random.randint(1,6) for x in range(len(player_data[current_player]['unrevealed']))])
+                    player_data[current_player][0] = sorted(player_data[current_player][0])
+                    player_data[current_player][1] = sorted([random.randint(1,6) for x in range(len(player_data[current_player][1]))])
 
                     print("{player} said there are {quantity}, {value}s".format(player=player_names[(current_turn-2)%len(player_names)], quantity=current_guess[0], value=current_guess[1]))
 
                     for player_name in player_data:
-                        if player_data[player_name]['revealed'] == []:
+                        if player_data[player_name][0] == []:
                             if player_name != current_player:
-                                print("{player} has not revealed any dice and has {number} hidden dice".format(player=player_name, number=len(player_data[player_name]['unrevealed'])))
+                                print("{player} has not revealed any dice and has {number} hidden dice".format(player=player_name, number=len(player_data[player_name][1])))
                             else:
-                                print("You haven't revealed any dice and have {dice} hidden".format(dice=player_data[player_name]['unrevealed']))
+                                print("You haven't revealed any dice and have {dice} hidden".format(dice=player_data[player_name][1]))
 
                         else:
                             if player_name != current_player:
-                                print("{player} has revealed {revealed} and has {number} hidden dice".format(player=player_name, revealed=player_data[player_name]['revealed'], number=len(player_data[player_name]['unrevealed'])))
+                                print("{player} has revealed {revealed} and has {number} hidden dice".format(player=player_name, revealed=player_data[player_name][0], number=len(player_data[player_name][1])))
                             else:
-                                print("You have {revealed} revealed and have {unrevealed} hidden".format(revealed=player_data[player_name]['revealed'], unrevealed=player_data[player_name]['unrevealed']))
+                                print("You have {revealed} revealed and have {unrevealed} hidden".format(revealed=player_data[player_name][0], unrevealed=player_data[player_name][1]))
 
             print("What's your guess?")
 
@@ -120,7 +120,7 @@ def turn():
 player_names = []
 
 while True:
-    player_name = input("Enter a player name: ").lower().strip()
+    player_name = input("Enter a player name: ").lower().strip().title()
 
     if player_name == '' or player_name == 'done' or player_name == 'finished':
         break
@@ -153,7 +153,7 @@ while len(player_dice) > 1:
     player_data = {}
 
     for player_name in player_dice:
-        player_data[player_name] = {'revealed': [], 'unrevealed': sorted([random.randint(1,6) for x in range(player_dice[player_name])])}
+        player_data[player_name] = [[], sorted([random.randint(1,6) for x in range(player_dice[player_name])])]
 
     called = False
 

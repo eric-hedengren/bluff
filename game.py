@@ -1,15 +1,5 @@
-# imports
 import random
 
-
-# functions
-def roll(number):
-    dice = []
-
-    for i in range(number):
-        dice.append(random.randint(1,6))
-
-    return sorted(dice)
 
 def turn():
     current_player = player_names[(current_turn-1)%len(player_names)]
@@ -35,8 +25,8 @@ def turn():
 
     if current_turn == 1:
         print("What's your guess?")
-        current_guess.append(int(input("How many? ")))
-        current_guess.append(int(input("What number? ")))
+        current_guess[0] = int(input("How many? "))
+        current_guess[1] = int(input("What number? "))
 
     else:
         option = input("Will you call their guess or raise it higher? ").lower().strip()
@@ -104,7 +94,7 @@ def turn():
                         player_data[current_player]['unrevealed'] = [number for number in unrevealed if number != 6]
 
                     player_data[current_player]['revealed'] = sorted(player_data[current_player]['revealed'])
-                    player_data[current_player]['unrevealed'] = roll(len(player_data[current_player]['unrevealed']))
+                    player_data[current_player]['unrevealed'] = sorted([random.randint(1,6) for x in range(len(player_data[current_player]['unrevealed']))])
 
                     print("{player} said there are {quantity}, {value}s".format(player=player_names[(current_turn-2)%len(player_names)], quantity=current_guess[0], value=current_guess[1]))
 
@@ -127,7 +117,6 @@ def turn():
             current_guess[1] = int(input("What number? "))
 
 
-# players
 player_names = []
 
 while True:
@@ -145,7 +134,6 @@ if len(player_names) != len(set(player_names)):
     raise Exception("Cannot have duplicate player names. Stats are important and we can't track those if you have duplicates!")
 
 
-# number of dice
 dice_number = int(input("Enter the number of dice per player: "))
 
 if dice_number <= 0:
@@ -156,17 +144,19 @@ player_dice = {}
 for player_name in player_names:
     player_dice[player_name] = dice_number
 
-current_turn = 1
-current_guess = []
+
+current_turn = 0
+current_guess = [0, 0]
 
 
-while len(player_dice) != 1:
-    called = False
+while len(player_dice) > 1:
     player_data = {}
 
-    for player_name in player_names:
-        player_data[player_name] = {'revealed': [], 'unrevealed': roll(player_dice[player_name])}
+    for player_name in player_dice:
+        player_data[player_name] = {'revealed': [], 'unrevealed': sorted([random.randint(1,6) for x in range(player_dice[player_name])])}
+
+    called = False
 
     while called != True:
-        called = turn()
         current_turn += 1
+        called = turn()

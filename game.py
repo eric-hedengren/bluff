@@ -47,7 +47,7 @@ def turn():
 
             if current_guess[0] == correct_amount:                
                 for player_name in player_dice:
-                    if player_name != current_player:
+                    if player_name != player_names[(current_turn-2)%len(player_names)]:
                         player_dice[player_name] -= 1
 
                 game_data['current_turn'] -= 1
@@ -98,20 +98,7 @@ def turn():
                     player_data[current_player][0] = sorted(player_data[current_player][0])
                     player_data[current_player][1] = sorted([random.randint(1,6) for x in range(len(player_data[current_player][1]))])
 
-                    print("{player} said there are {quantity}, {value}s".format(player=player_names[(current_turn-2)%len(player_names)], quantity=current_guess[0], value=current_guess[1]))
-
-                    for player_name in player_data:
-                        if player_data[player_name][0] == []:
-                            if player_name != current_player:
-                                print("{player} has not revealed any dice and has {number} hidden dice".format(player=player_name, number=len(player_data[player_name][1])))
-                            else:
-                                print("You haven't revealed any dice and have {dice} hidden".format(dice=player_data[player_name][1]))
-
-                        else:
-                            if player_name != current_player:
-                                print("{player} has revealed {revealed} and has {number} hidden dice".format(player=player_name, revealed=player_data[player_name][0], number=len(player_data[player_name][1])))
-                            else:
-                                print("You have {revealed} revealed and have {unrevealed} hidden".format(revealed=player_data[player_name][0], unrevealed=player_data[player_name][1]))
+                    print("You have {revealed} out and rolled {unrevealed}".format(revealed=player_data[current_player][0], unrevealed=player_data[current_player][1]))
 
             print("What's your guess?")
 
@@ -146,7 +133,7 @@ player_dice = {}
 for player_name in player_names:
     player_dice[player_name] = dice_number
 
-game_data = {'current_turn': 0, 'bluff_called': False}
+game_data = {'current_turn': 0}
 
 
 while len(player_dice) > 1:
@@ -156,6 +143,7 @@ while len(player_dice) > 1:
         player_data[player_name] = [[], sorted([random.randint(1,6) for x in range(player_dice[player_name])])]
 
     current_guess = [0, 0]
+    game_data['bluff_called'] = False
 
     while game_data['bluff_called'] != True:
         turn()

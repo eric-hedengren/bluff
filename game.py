@@ -29,7 +29,6 @@ for starting_name in starting_names:
 game_data = {}
 
 while len(player_dice) > 1:
-    print('running again')
     if 'previous_winner' in game_data:
         starting_position = list(player_dice.keys()).index(game_data['previous_winner'])
         remaining_players = list(player_dice.keys())[starting_position:] + list(player_dice.keys())[:starting_position]

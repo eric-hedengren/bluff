@@ -77,9 +77,9 @@ while len(player_dice) > 1:
             current_guess[1] = int(input("What number? "))
 
         else:
-            option = input("Will you call their guess or raise it higher? ").strip().lower()
+            option = input("Will you call bluff on their guess or raise it higher? ").strip().lower()
 
-            if option == 'call' or option == 'call it' or option == 'call the bluff':
+            if option == 'call' or option == 'bluff' or option == 'call it' or option == 'call bluff' or option == 'call the bluff':
                 correct_amount = 0
 
                 for player_name in player_data:
@@ -98,20 +98,22 @@ while len(player_dice) > 1:
                         if player_name != previous_player:
                             player_dice[player_name] -= 1
 
-                    print("{caller} called {guesser}'s guess, but {guesser} guessed the exact amount!".format(caller=current_player, guesser=previous_player))
+                    print("{caller} called bluff on {guesser}'s guess, but {guesser} guessed the exact amount!".format(caller=current_player, guesser=previous_player))
                     print("Everyone loses 1 dice, except {guesser}".format(guesser=previous_player))
 
                 elif current_guess[0] < correct_amount:
                     game_data['previous_winner'] = previous_player
                     player_dice[current_player] -= (correct_amount - current_guess[0])
-                    print("{caller} called {guesser}'s guess, but it was below the correct amount!".format(caller=current_player, guesser=previous_player))
+
+                    print("{caller} called bluff on {guesser}'s guess, but it was below the correct amount!".format(caller=current_player, guesser=previous_player))
                     print("{caller} loses {amount} dice".format(caller=current_player, amount=(correct_amount-current_guess[0])))
 
                 elif current_guess[0] > correct_amount:
                     game_data['previous_winner'] = current_player
                     player_dice[previous_player] -= (current_guess[0] - correct_amount)
-                    print("{caller} called {guesser}'s guess, and it was above the correct amount!".format(caller=current_player, guesser=previous_player))
-                    print("{guesser} loses {amount}".format(guesser=previous_player, amount=(current_guess[0]-correct_amount)))
+
+                    print("{caller} called bluff on {guesser}'s guess, and it was above the correct amount!".format(caller=current_player, guesser=previous_player))
+                    print("{guesser} loses {amount} dice".format(guesser=previous_player, amount=(current_guess[0]-correct_amount)))
 
                 for player_name in player_names:
                     if player_dice[player_name] <= 0:

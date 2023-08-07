@@ -122,7 +122,9 @@ while len(player_dice) > 1:
                 game_data['bluff_called'] = True
 
             else:
-                if len(player_data[current_player][1]) > 1:
+                unrevealed = player_data[current_player][1]
+
+                if len(unrevealed) > 1:
                     option = input("Would you like to put out dice and roll the remaining ones? ").strip().lower()
 
                     if option != 'n' and option != 'no':
@@ -131,16 +133,20 @@ while len(player_dice) > 1:
                         if value < 1 or value > 6:
                             raise Exception("Not a valid number!")
 
-                        unrevealed = player_data[current_player][1]
+                        if value not in unrevealed:
+                            raise Exception("You don't have that number in your dice!")
+
+                        complete = False
                         amount = unrevealed.count(value)
 
                         if amount == len(unrevealed):
                             amount -= 1
+                            complete = True
 
                         player_data[current_player][0].extend([value]*amount)
                         player_data[current_player][1] = [number for number in unrevealed if number != value]
 
-                        if value != 6:
+                        if complete or value != 6:
                             unrevealed = player_data[current_player][1]
                             amount = unrevealed.count(6)
 
@@ -154,6 +160,13 @@ while len(player_dice) > 1:
                         player_data[current_player][1] = sorted([random.randint(1,6) for x in range(len(player_data[current_player][1]))])
 
                         print("You have {revealed} out and rolled {unrevealed}".format(revealed=player_data[current_player][0], unrevealed=player_data[current_player][1]))
+
+                if len(unrevealed) == 1:
+                    option = input("Would you like to reroll your hidden dice? ").strip().lower()
+
+                    if option != 'n' and option != 'no':
+                        player_data[current_player][1] = sorted([random.randint(1,6) for x in range(len(player_data[current_player][1]))])
+                        print("You rolled {unrevealed}".format(unrevealed=player_data[current_player][1]))
 
                 print("What's your guess?")
 

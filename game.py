@@ -41,7 +41,7 @@ while len(player_dice) > 1:
     player_names = list(player_dice.keys())
     player_data = {}
 
-    for player_name in player_dice:
+    for player_name in player_names:
         player_data[player_name] = [[], sorted([random.randint(1,6) for x in range(player_dice[player_name])])]
 
     current_turn = 0
@@ -89,21 +89,23 @@ while len(player_dice) > 1:
                     for player_name in player_data:
                         correct_amount += player_data[player_name][0].count(6) + player_data[player_name][1].count(6)
 
+                previous_player = player_names[(current_turn-2)%len(player_names)]
+
                 if current_guess[0] == correct_amount:                
-                    game_data['previous_winner'] = player_names[(current_turn-2)%len(player_names)]
-                    for player_name in player_dice:
-                        if player_name != player_names[(current_turn-2)%len(player_names)]:
+                    game_data['previous_winner'] = previous_player
+                    for player_name in player_names:
+                        if player_name != previous_player:
                             player_dice[player_name] -= 1
 
                 elif current_guess[0] < correct_amount:
-                    game_data['previous_winner'] = player_names[(current_turn-2)%len(player_names)]
+                    game_data['previous_winner'] = previous_player
                     player_dice[current_player] -= (correct_amount - current_guess[0])
 
                 elif current_guess[0] > correct_amount:
                     game_data['previous_winner'] = current_player
-                    player_dice[player_names[(current_turn-2)%len(player_names)]] -= (current_guess[0] - correct_amount)
+                    player_dice[previous_player] -= (current_guess[0] - correct_amount)
 
-                for player_name in player_dice:
+                for player_name in player_names:
                     if player_dice[player_name] <= 0:
                         del player_dice[player_name]
 

@@ -71,11 +71,6 @@ def turn():
                 option = input("Would you like to put out dice and roll the remaining ones? ").lower().strip()
 
                 if option != 'n' and option != 'no':
-                    if player_data[current_player][0] == []:
-                        print("You haven't revealed any dice and have {dice} hidden".format(dice=player_data[current_player][1]))
-                    else:
-                        print("You have {revealed} revealed and have {unrevealed} hidden".format(revealed=player_data[current_player][0], unrevealed=player_data[current_player][1]))
-
                     value = int(input("Which number would you like to put out? "))
 
                     if value < 1 or value > 6:

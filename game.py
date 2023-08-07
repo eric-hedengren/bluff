@@ -24,10 +24,9 @@ def turn():
             else:
                 print("You have {revealed} revealed and have {unrevealed} hidden".format(revealed=player_data[player_name][0], unrevealed=player_data[player_name][1]))
 
-    print("The next turn will go to {player}".format(player=player_names[(current_turn)%len(player_names)]))
-
     if current_turn == 1:
         print("What's your guess?")
+
         current_guess[0] = int(input("How many? "))
         current_guess[1] = int(input("What number? "))
 

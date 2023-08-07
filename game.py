@@ -2,10 +2,13 @@ import random
 
 
 def turn():
+    game_data['current_turn'] += 1
+    current_turn = game_data['current_turn']
+
     current_player = player_names[(current_turn-1)%len(player_names)]
     print("It's {player}'s turn".format(player=current_player))
 
-    if current_turn != 1:
+    if current_turn > 1:
         print("{player} said there are {quantity}, {value}s".format(player=player_names[(current_turn-2)%len(player_names)], quantity=current_guess[0], value=current_guess[1]))
 
     for player_name in player_data:
@@ -40,15 +43,19 @@ def turn():
                     correct_amount += player_data[player_name][0].count(6) + player_data[player_name][1].count(6)
 
             elif current_guess == 6:
-                correct_amount += player_data[player_name][0].count(current_guess[1]) + player_data[player_name][1].count(current_guess[1])
+                for player_name in player_data:
+                    correct_amount += player_data[player_name][0].count(current_guess[1]) + player_data[player_name][1].count(current_guess[1])
 
-            if current_guess[0] == correct_amount:
+            if current_guess[0] == correct_amount:                
                 for player_name in player_dice:
                     if player_name != current_player:
                         player_dice[player_name] -= 1
 
+                game_data['current_turn'] -= 1
+
             elif current_guess[0] < correct_amount:
                 player_dice[current_player] -= (correct_amount - current_guess[0])
+                game_data['current_turn'] -= 1
 
             elif current_guess[0] > correct_amount:
                 player_dice[player_names[(current_turn-2)%len(player_names)]] -= (current_guess[0] - correct_amount)
@@ -57,7 +64,8 @@ def turn():
                 if player_dice[player_name] <= 0:
                     del player_dice[player_name]
 
-            return True
+            game_data['current_turn'] -= 1
+            game_data['bluff_called'] = True
 
         else:
             if len(player_data[current_player][1]) > 1:
@@ -120,7 +128,7 @@ def turn():
 player_names = []
 
 while True:
-    player_name = input("Enter a player name: ").lower().strip().title()
+    player_name = input("Enter a player name: ").title().strip()
 
     if player_name == '' or player_name == 'done' or player_name == 'finished':
         break
@@ -144,9 +152,7 @@ player_dice = {}
 for player_name in player_names:
     player_dice[player_name] = dice_number
 
-
-current_turn = 0
-current_guess = [0, 0]
+game_data = {'current_turn': 0, 'bluff_called': False}
 
 
 while len(player_dice) > 1:
@@ -155,8 +161,7 @@ while len(player_dice) > 1:
     for player_name in player_dice:
         player_data[player_name] = [[], sorted([random.randint(1,6) for x in range(player_dice[player_name])])]
 
-    called = False
+    current_guess = [0, 0]
 
-    while called != True:
-        current_turn += 1
-        called = turn()
+    while game_data['bluff_called'] != True:
+        turn()

@@ -11,70 +11,135 @@ def roll(number):
 
     return sorted(dice)
 
-def dice_data(option):
-    other_players = player_names.copy()
-    other_players.remove(current_player)
+def turn():
+    current_player = player_names[(current_turn-1)%len(player_names)]
+    print("It's {player}'s turn".format(player=current_player))
 
-    if option == 'revealed_dice':
-        revealed_dice = {}
+    if current_turn != 1:
+        print("{player} said there are {quantity}, {value}s".format(player=player_names[(current_turn-2)%len(player_names)], quantity=current_guess[0], value=current_guess[1]))
 
-        for other_player in other_players:
-            revealed_dice[other_player] = player_data[other_player]['revealed_dice']
+    for player_name in player_data:
+        if player_data[player_name]['revealed'] == []:
+            if player_name != current_player:
+                print("{player} has not revealed any dice and has {number} hidden dice".format(player=player_name, number=len(player_data[player_name]['unrevealed'])))
+            else:
+                print("You haven't revealed any dice and have {dice} hidden".format(dice=player_data[player_name]['unrevealed']))
 
-        return revealed_dice
+        else:
+            if player_name != current_player:
+                print("{player} has revealed {revealed} and has {number} hidden dice".format(player=player_name, revealed=player_data[player_name]['revealed'], number=len(player_data[player_name]['unrevealed'])))
+            else:
+                print("You have {revealed} revealed and have {unrevealed} hidden".format(revealed=player_data[player_name]['revealed'], unrevealed=player_data[player_name]['unrevealed']))
 
-    elif option == 'unrevealed_dice':
-        unrevealed_dice = {}
+    print("The next turn will go to {player}".format(player=player_names[(current_turn)%len(player_names)]))
 
-        for other_player in other_players:
-            unrevealed_dice[other_player] = len(player_data[other_player]['unrevealed_dice'])
+    if current_turn == 1:
+        print("What's your guess?")
+        current_guess.append(int(input("How many? ")))
+        current_guess.append(int(input("What number? ")))
 
-        return unrevealed_dice
-    
-def total_dice(player_data, player_names):
-    total = 0
-    
-    for player_name in player_names:
-        total += len(player_data[player_name]['revealed_dice'] + len(player_data[player_name]['unrevealed_dice']))
+    else:
+        option = input("Will you call their guess or raise it higher? ").lower().strip()
 
-    return total
+        if option == 'call' or option == 'call it' or option == 'call the bluff':
+            correct_amount = 0
 
+            if current_guess[1] != 6:
+                for player_name in player_data:
+                    correct_amount += player_data[player_name]['revealed'].count(current_guess[1]) + player_data[player_name]['unrevealed'].count(current_guess[1])
+                    correct_amount += player_data[player_name]['revealed'].count(6) + player_data[player_name]['unrevealed'].count(6)
 
-# bot logic
-def bot_turn_first():
-    return
+            elif current_guess == 6:
+                correct_amount += player_data[player_name]['revealed'].count(current_guess[1]) + player_data[player_name]['unrevealed'].count(current_guess[1])
 
-def bot_turn():
-    return
+            if current_guess[0] == correct_amount:
+                for player_name in player_dice:
+                    if player_name != current_player:
+                        player_dice[player_name] -= 1
+
+            elif current_guess[0] < correct_amount:
+                player_dice[current_player] -= (correct_amount - current_guess[0])
+
+            elif current_guess[0] > correct_amount:
+                player_dice[player_names[(current_turn-2)%len(player_names)]] -= (current_guess[0] - correct_amount)
+
+            for player_name in player_dice:
+                if player_dice[player_name] <= 0:
+                    del player_dice[player_name]
+
+            return True
+
+        else:
+            if len(player_data[current_player]['unrevealed']) > 1:
+                option = input("Would you like to put out dice and roll the remaining ones? ").lower().strip()
+
+                if option != 'n' and option != 'no':
+                    if player_data[current_player]['revealed'] == []:
+                        print("You haven't revealed any dice and have {dice} hidden".format(dice=player_data[current_player]['unrevealed']))
+                    else:
+                        print("You have {revealed} revealed and have {unrevealed} hidden".format(revealed=player_data[current_player]['revealed'], unrevealed=player_data[current_player]['unrevealed']))
+
+                    value = int(input("Which number would you like to put out? "))
+
+                    if value < 1 or value > 6:
+                        raise Exception("Not a valid number!")
+
+                    unrevealed = player_data[current_player]['unrevealed']
+                    amount = unrevealed.count(value)
+
+                    if amount == len(unrevealed):
+                        amount -= 1
+
+                    player_data[current_player]['revealed'].extend([value]*amount)
+                    player_data[current_player]['unrevealed'] = [number for number in unrevealed if number != value]
+
+                    if value != 6:
+                        unrevealed = player_data[current_player]['unrevealed']
+                        amount = unrevealed.count(6)
+
+                        if amount == len(unrevealed):
+                            amount -= 1
+
+                        player_data[current_player]['revealed'].extend([6]*amount)
+                        player_data[current_player]['unrevealed'] = [number for number in unrevealed if number != 6]
+
+                    player_data[current_player]['revealed'] = sorted(player_data[current_player]['revealed'])
+                    player_data[current_player]['unrevealed'] = roll(len(player_data[current_player]['unrevealed']))
+
+                    print("{player} said there are {quantity}, {value}s".format(player=player_names[(current_turn-2)%len(player_names)], quantity=current_guess[0], value=current_guess[1]))
+
+                    for player_name in player_data:
+                        if player_data[player_name]['revealed'] == []:
+                            if player_name != current_player:
+                                print("{player} has not revealed any dice and has {number} hidden dice".format(player=player_name, number=len(player_data[player_name]['unrevealed'])))
+                            else:
+                                print("You haven't revealed any dice and have {dice} hidden".format(dice=player_data[player_name]['unrevealed']))
+
+                        else:
+                            if player_name != current_player:
+                                print("{player} has revealed {revealed} and has {number} hidden dice".format(player=player_name, revealed=player_data[player_name]['revealed'], number=len(player_data[player_name]['unrevealed'])))
+                            else:
+                                print("You have {revealed} revealed and have {unrevealed} hidden".format(revealed=player_data[player_name]['revealed'], unrevealed=player_data[player_name]['unrevealed']))
+
+            print("What's your guess?")
+
+            current_guess[0] = int(input("How many? "))
+            current_guess[1] = int(input("What number? "))
 
 
 # players
-humans = []
+player_names = []
 
 while True:
-    human = input("Enter a player name: ").lower()
+    player_name = input("Enter a player name: ").lower().strip()
 
-    if human == '' or human == 'done' or human == 'finished':
+    if player_name == '' or player_name == 'done' or player_name == 'finished':
         break
     else:
-        humans.append(human)
+        player_names.append(player_name)
 
-bots = input("Enter the number of bots: ")
-
-if bots == '':
-    bots = 0
-
-bots = int(bots)
-
-if len(humans) + bots < 2:
+if len(player_names) < 2:
     raise Exception("Number of players must be equal or greater to 2. The game can't be played with no one or by yourself!")
-
-
-# player names
-player_names = humans
-
-for i in range(1,bots+1):
-    player_names.append('bot'+str(i))
 
 if len(player_names) != len(set(player_names)):
     raise Exception("Cannot have duplicate player names. Stats are important and we can't track those if you have duplicates!")
@@ -91,99 +156,17 @@ player_dice = {}
 for player_name in player_names:
     player_dice[player_name] = dice_number
 
+current_turn = 1
+current_guess = []
 
-# the main game
-while True:
-    # initialize data
-    player_number = len(player_names)
+
+while len(player_dice) != 1:
+    called = False
     player_data = {}
 
     for player_name in player_names:
-        player_data[player_name] = {'revealed_dice': [], 'unrevealed_dice': roll(player_dice[player_name])}
+        player_data[player_name] = {'revealed': [], 'unrevealed': roll(player_dice[player_name])}
 
-    # determine player order
-    random.shuffle(player_names)
-
-    turn = 1
-    current_player = player_names[turn-1]
-
-
-    # bot first turn
-    if current_player.startswith('bot'):
-        current_guess = bot_turn_first()
-        print("{bot} took it's turn".format(bot=current_player))
-
-    # human first turn
-    else:
-        print("It's {player}'s turn".format(player=current_player))
-        print("These are the dice you have rolled: {dice}".format(dice=player_data[current_player]['unrevealed_dice']))
-        print("There are {number} dice you cannot see".format(number=dice_data('unrevealed_dice')))
-        print("What's your guess?")
-
-        current_guess = []
-        current_guess.append(int(input("How many? ")))
-        current_guess.append(int(input("What number? ")))
-
-
-        if current_guess[0] <= 0:
-            raise Exception("Not a valid quantity.")
-
-        if current_guess[0] > total_dice(player_data, player_names):
-            raise Exception("Cannot guess higher than the total number of dice.")
-
-        if current_guess[1] < 1 or current_guess[1] > 6:
-            raise Exception("You cannot guess outside the 1-6 range.")
-
-
-    # the game after the first turn
-    while True:
-        turn += 1
-        current_player = player_names[(turn-1)%player_number]
-
-        # bot turn
-        if current_player.startswith('bot'):
-            current_guess = bot_turn()
-            print("{bot} took it's turn".format(bot=current_player))
-
-        # human turn
-        else:
-            print("It's {player}'s turn".format(player=current_player))
-            print("These are the dice that are known: {dice}".format(dice=dice_data('revealed_dice')))
-            print("There are {number} dice you cannot see".format(number=dice_data('unrevealed_dice')))
-            print("The current guess is {number} {roll}s".format(number=current_guess[0], roll=current_guess[1]))
-            
-            choice = input("Do you want to call it, or guess higher? ").lower()
-
-            # if guess was chosen, let them keep the dice they have, or put some dice out and re roll, then guess
-            previous_guess = current_guess
-
-            # validate the guess
-            if current_guess[0] > total_dice(player_data, player_names):
-                raise Exception("Cannot guess higher than the total number of dice.")
-
-            if current_guess[1] < 1 or current_guess[1] > 6:
-                raise Exception("You cannot guess outside the 1-6 range.")
-
-            # check if the guess switched between 6 and 1-5
-
-
-        # if a guess was called: 
-        # check who won the round
-        # take away the right amount of dice from certain players
-        # check if the game is over
-
-        break
-
-
-    # save game stats
-
-
-    # end of game
-    response = input("Play again? This will use the same settings. ").lower()
-
-    if response == 'no':
-        print("Thanks for playing!")
-        break
-    else:
-        print("Alright great! Restarting...")
-        continue
+    while called != True:
+        called = turn()
+        current_turn += 1

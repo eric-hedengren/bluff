@@ -180,8 +180,17 @@ while len(player_dice) > 1:
                 current_guess[0] = int(input("How many? "))
                 current_guess[1] = int(input("What number? "))
 
-                if current_guess[0] < previous_guess[0] or current_guess[1] < previous_guess[1]:
-                    raise Exception("Guess was not raised!")
+                if current_guess[0] != 6:
+                    if current_guess[0] < previous_guess[0] or current_guess[1] < previous_guess[1]:
+                        raise Exception("Guess was not raised!")
+
+                elif current_guess[0] == 6 and previous_guess == 6:
+                    if current_guess[0] < previous_guess[0]:
+                        raise Exception("Guess was not raised!")
+
+                elif current_guess[0] == 6 and previous_guess != 6:
+                    if current_guess[0]*2 <= previous_guess[0]:
+                        raise Exception("Guess was not raised!")
 
                 if current_guess[1] < 1 or current_guess[1] > 6:
                     raise Exception("That number isn't valid.")

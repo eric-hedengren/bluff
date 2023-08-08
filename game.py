@@ -76,6 +76,12 @@ while len(player_dice) > 1:
             current_guess[0] = int(input("How many? "))
             current_guess[1] = int(input("What number? "))
 
+            if current_guess[0] <= 0:
+                raise Exception("You can't guess that!")
+
+            if current_guess[1] < 1 or current_guess[1] > 6:
+                raise Exception("That number isn't valid.")
+
         else:
             option = input("Will you call bluff on their guess or raise it higher? ").strip().lower()
 
@@ -168,7 +174,14 @@ while len(player_dice) > 1:
                         player_data[current_player][1] = sorted([random.randint(1,6) for x in range(len(player_data[current_player][1]))])
                         print("You rolled {unrevealed}".format(unrevealed=player_data[current_player][1]))
 
+                previous_guess = current_guess
                 print("What's your guess?")
 
                 current_guess[0] = int(input("How many? "))
                 current_guess[1] = int(input("What number? "))
+
+                if current_guess[0] < previous_guess[0] or current_guess[1] < previous_guess[1]:
+                    raise Exception("Guess was not raised!")
+
+                if current_guess[1] < 1 or current_guess[1] > 6:
+                    raise Exception("That number isn't valid.")

@@ -106,19 +106,21 @@ while len(player_dice) > 1:
 
                     print("{caller} called the bluff on {guesser}'s guess, but {guesser} guessed the exact amount!".format(caller=current_player, guesser=previous_player))
 
-                    if len(player_names) > 2:
-                        remaining_opponents = 0
+                    remaining_opponents = []
 
-                        for player_name in player_names:
+                    for player_name in player_names:
+                        if player_name != previous_player:
                             if player_dice[player_name]:
-                                remaining_opponents += 1
+                                remaining_opponents.append(player_name)
 
-                        if remaining_opponents:
-                            print("Everyone loses 1 dice, except {guesser}".format(guesser=previous_player))
-
-                    elif len(player_names) == 2:
-                        if player_dice[current_player] > 0:
-                            print("{caller} loses 1 dice".format(caller=current_player))
+                    if len(remaining_opponents) == len(player_names)-1:
+                        print("Everyone loses 1 dice except {guesser}".format(guesser=previous_player))
+                    elif len(remaining_opponents) > 2:
+                        print("{opponents} lose 1 dice".format(opponents=', '.join(remaining_opponents[:-1])+', and '+remaining_opponents[-1]))
+                    elif len(remaining_opponents) == 2:
+                        print("{opponents} lose 1 dice".format(opponent=' and '.join(remaining_opponents)))
+                    elif len(remaining_opponents) == 1:
+                        print("{opponent} loses 1 dice".format(opponent=remaining_opponents[0]))
 
                 elif current_guess[0] < correct_amount:
                     game_data['previous_winner'] = previous_player
@@ -145,8 +147,12 @@ while len(player_dice) > 1:
                         losing_players.append(player_name)
                         del player_dice[player_name]
 
-                if losing_players:
+                if len(losing_players) > 2:
+                    print("{players} ran out of dice!".format(players=', '.join(losing_players[:-1])+', and '+losing_players[-1]))
+                elif len(losing_players) == 2:
                     print("{players} ran out of dice!".format(players=' and '.join(losing_players)))
+                elif len(losing_players) == 1:
+                    print("{player} ran out of dice!".format(player=losing_players[0]))
 
                 game_data['bluff_called'] = True
 

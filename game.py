@@ -132,7 +132,9 @@ while len(player_dice) > 1:
                         losing_players.append(player_name)
                         del player_dice[player_name]
 
-                print("{players} ran out of dice!".format(players=' and '.join(losing_players)))
+                if losing_players:
+                    print("{players} ran out of dice!".format(players=' and '.join(losing_players)))
+
                 game_data['bluff_called'] = True
 
             else:
@@ -206,3 +208,5 @@ while len(player_dice) > 1:
                 elif current_guess[1] == 6 and previous_guess[1] != 6:
                     if current_guess[0]*2 <= previous_guess[0]:
                         raise Exception("Guess was not raised!")
+
+print("{winner} wins!".format(winner=game_data['previous_winner']))

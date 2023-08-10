@@ -174,7 +174,7 @@ while len(player_dice) > 1:
                         player_data[current_player][1] = sorted([random.randint(1,6) for x in range(len(player_data[current_player][1]))])
                         print("You rolled {unrevealed}".format(unrevealed=player_data[current_player][1]))
 
-                previous_guess = current_guess
+                previous_guess = current_guess.copy()
                 print("What's your guess?")
 
                 current_guess[0] = int(input("How many? "))

@@ -11,7 +11,7 @@ while True:
         starting_names.append(starting_name)
 
 if len(starting_names) < 2:
-    raise Exception("Number of players must be equal or greater to 2. The game can't be played with no one or by yourself!")
+    raise Exception("Number of players must be equal or greater than 2. The game can't be played with no one or by yourself!")
 
 if len(starting_names) != len(set(starting_names)):
     raise Exception("Cannot have duplicate player names. Stats are important and we can't track those if you have duplicates!")
@@ -152,7 +152,7 @@ while len(player_dice) > 1:
                         player_data[current_player][0].extend([value]*amount)
                         player_data[current_player][1] = [number for number in unrevealed if number != value]
 
-                        if complete or value != 6:
+                        if not complete and value != 6:
                             unrevealed = player_data[current_player][1]
                             amount = unrevealed.count(6)
 
@@ -180,21 +180,21 @@ while len(player_dice) > 1:
                 current_guess[0] = int(input("How many? "))
                 current_guess[1] = int(input("What number? "))
 
+                if current_guess[1] < 1 or current_guess[1] > 6:
+                    raise Exception("That number isn't valid.")
+
                 if current_guess[1] != 6 and previous_guess[1] != 6:
-                    if current_guess[0] < previous_guess[0]:
-                        raise Exception("Guess was not raised!")
-                    elif current_guess[1] == previous_guess[1] and current_guess[0] <= previous_guess[0]:
-                        raise Exception("Guess was not raised!")
-                    elif current_guess[0] == previous_guess[0] and current_guess[1] <= previous_guess[1]:
+                    if current_guess[0] == previous_guess[0] and current_guess[1] <= previous_guess[1] or current_guess[1] == previous_guess[1] and current_guess[0] <= previous_guess[0]:
                         raise Exception("Guess was not raised!")
 
                 elif current_guess[1] == 6 and previous_guess[1] == 6:
                     if current_guess[0] <= previous_guess[0]:
                         raise Exception("Guess was not raised!")
 
+                elif current_guess[1] != 6 and previous_guess[1] == 6:
+                    if current_guess[0] < previous_guess[0]*2:
+                        raise Exception("Guess was not raised!")
+
                 elif current_guess[1] == 6 and previous_guess[1] != 6:
                     if current_guess[0]*2 <= previous_guess[0]:
                         raise Exception("Guess was not raised!")
-
-                if current_guess[1] < 1 or current_guess[1] > 6:
-                    raise Exception("That number isn't valid.")

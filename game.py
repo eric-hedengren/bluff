@@ -118,7 +118,7 @@ while len(player_dice) > 1:
                     elif len(remaining_opponents) > 2:
                         print("{opponents} lose 1 dice".format(opponents=', '.join(remaining_opponents[:-1])+', and '+remaining_opponents[-1]))
                     elif len(remaining_opponents) == 2:
-                        print("{opponents} lose 1 dice".format(opponent=' and '.join(remaining_opponents)))
+                        print("{opponents} lose 1 dice".format(opponents=' and '.join(remaining_opponents)))
                     elif len(remaining_opponents) == 1:
                         print("{opponent} loses 1 dice".format(opponent=remaining_opponents[0]))
 

@@ -105,7 +105,11 @@ while len(player_dice) > 1:
                             player_dice[player_name] -= 1
 
                     print("{caller} called bluff on {guesser}'s guess, but {guesser} guessed the exact amount!".format(caller=current_player, guesser=previous_player))
-                    print("Everyone loses 1 dice, except {guesser}".format(guesser=previous_player))
+
+                    if len(player_names) > 2:
+                        print("Everyone loses 1 dice, except {guesser}".format(guesser=previous_player))
+                    elif len(player_names) == 2:
+                        print("{caller} loses 1 dice".format(caller=current_player))
 
                 elif current_guess[0] < correct_amount:
                     game_data['previous_winner'] = previous_player

@@ -54,7 +54,7 @@ while len(player_dice) > 1:
         current_player = player_names[(current_turn-1)%len(player_names)]
         print("It's {player}'s turn".format(player=current_player))
 
-        for player_name in player_data:
+        for player_name in player_names:
             if player_data[player_name][0] == []:
                 if player_name != current_player:
                     print("{player} has not revealed any dice and has {number} hidden dice".format(player=player_name, number=len(player_data[player_name][1])))
@@ -88,11 +88,11 @@ while len(player_dice) > 1:
             if option == 'call' or option == 'bluff' or option == 'call it' or option == 'call bluff' or option == 'call the bluff':
                 correct_amount = 0
 
-                for player_name in player_data:
+                for player_name in player_names:
                     correct_amount += player_data[player_name][0].count(current_guess[1]) + player_data[player_name][1].count(current_guess[1])
 
                 if current_guess[1] != 6:
-                    for player_name in player_data:
+                    for player_name in player_names:
                         correct_amount += player_data[player_name][0].count(6) + player_data[player_name][1].count(6)
 
                 previous_player = player_names[(current_turn-2)%len(player_names)]
@@ -107,23 +107,36 @@ while len(player_dice) > 1:
                     print("{caller} called bluff on {guesser}'s guess, but {guesser} guessed the exact amount!".format(caller=current_player, guesser=previous_player))
 
                     if len(player_names) > 2:
-                        print("Everyone loses 1 dice, except {guesser}".format(guesser=previous_player))
+                        remaining_opponents = 0
+
+                        for player_name in player_names:
+                            if player_dice[player_name]:
+                                remaining_opponents += 1
+
+                        if remaining_opponents:
+                            print("Everyone loses 1 dice, except {guesser}".format(guesser=previous_player))
+
                     elif len(player_names) == 2:
-                        print("{caller} loses 1 dice".format(caller=current_player))
+                        if player_dice[current_player] > 0:
+                            print("{caller} loses 1 dice".format(caller=current_player))
 
                 elif current_guess[0] < correct_amount:
                     game_data['previous_winner'] = previous_player
                     player_dice[current_player] -= (correct_amount - current_guess[0])
 
                     print("{caller} called bluff on {guesser}'s guess, but it was below the correct amount!".format(caller=current_player, guesser=previous_player))
-                    print("{caller} loses {amount} dice".format(caller=current_player, amount=(correct_amount-current_guess[0])))
+
+                    if player_dice[current_player] > 0:
+                        print("{caller} loses {amount} dice".format(caller=current_player, amount=(correct_amount-current_guess[0])))
 
                 elif current_guess[0] > correct_amount:
                     game_data['previous_winner'] = current_player
                     player_dice[previous_player] -= (current_guess[0] - correct_amount)
 
                     print("{caller} called bluff on {guesser}'s guess, and it was above the correct amount!".format(caller=current_player, guesser=previous_player))
-                    print("{guesser} loses {amount} dice".format(guesser=previous_player, amount=(current_guess[0]-correct_amount)))
+
+                    if player_dice[previous_player] > 0:
+                        print("{guesser} loses {amount} dice".format(guesser=previous_player, amount=(current_guess[0]-correct_amount)))
 
                 losing_players = []
 

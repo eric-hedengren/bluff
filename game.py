@@ -125,10 +125,14 @@ while len(player_dice) > 1:
                     print("{caller} called bluff on {guesser}'s guess, and it was above the correct amount!".format(caller=current_player, guesser=previous_player))
                     print("{guesser} loses {amount} dice".format(guesser=previous_player, amount=(current_guess[0]-correct_amount)))
 
+                losing_players = []
+
                 for player_name in player_names:
                     if player_dice[player_name] <= 0:
+                        losing_players.append(player_name)
                         del player_dice[player_name]
 
+                print("{players} ran out of dice!".format(players=' and '.join(losing_players)))
                 game_data['bluff_called'] = True
 
             else:

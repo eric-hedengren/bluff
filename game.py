@@ -171,7 +171,7 @@ while len(player_dice) > 1:
 
                         print("You have {revealed} out and rolled {unrevealed}".format(revealed=player_data[current_player][0], unrevealed=player_data[current_player][1]))
 
-                if len(unrevealed) == 1:
+                elif len(unrevealed) == 1:
                     option = input("Would you like to reroll your hidden dice? ").strip().lower()
 
                     if option != 'n' and option != 'no':

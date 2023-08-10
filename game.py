@@ -113,7 +113,7 @@ while len(player_dice) > 1:
                             if player_dice[player_name]:
                                 remaining_opponents.append(player_name)
 
-                    if len(remaining_opponents) == len(player_names)-1:
+                    if len(remaining_opponents) == len(player_names)-1 and len(remaining_opponents) != 1:
                         print("Everyone loses 1 dice except {guesser}".format(guesser=previous_player))
                     elif len(remaining_opponents) > 2:
                         print("{opponents} lose 1 dice".format(opponents=', '.join(remaining_opponents[:-1])+', and '+remaining_opponents[-1]))
@@ -147,7 +147,9 @@ while len(player_dice) > 1:
                         losing_players.append(player_name)
                         del player_dice[player_name]
 
-                if len(losing_players) > 2:
+                if len(losing_players) == len(player_names)-1 and len(losing_players) != 1:
+                    print("Everyone ran out of dice, except {winner}!".format(winner=previous_player))
+                elif len(losing_players) > 2:
                     print("{players} ran out of dice!".format(players=', '.join(losing_players[:-1])+', and '+losing_players[-1]))
                 elif len(losing_players) == 2:
                     print("{players} ran out of dice!".format(players=' and '.join(losing_players)))
